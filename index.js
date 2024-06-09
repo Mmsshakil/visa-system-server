@@ -48,13 +48,28 @@ async function run() {
         })
 
 
+        // show all users data
+        app.get('/allusers', async (req, res) => {
+            const cursor = usersCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
 
 
+        // get carts of specific user's email
 
-
-
-
+        app.get('/allusers/:email', async (req, res) => {
+            const email = req.params.email; // Access the email from route parameters
+            const query = { email: email };
+            try {
+                const result = await usersCollection.find(query).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        });
 
 
 
