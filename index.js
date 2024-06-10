@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
+const { ObjectId } = require('mongodb');
 
 
 //middleware
@@ -71,7 +72,59 @@ async function run() {
             }
         });
 
+        // find a product---- this api problem
+        // app.get('/allusers/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) }
+        //     // console.log(query);
+        //     const result = await usersCollection.findOne(query);
+        //     res.send(result);
+        // })
 
+
+        
+        // update user details after eca application-todo
+
+        app.patch('/allEcaUsers/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateUserInfo = req.body;
+            const user = {
+                $set: {
+
+                    bscGrade: updateUserInfo.bscGrade,
+                    bscSubject: updateUserInfo.bscSubject,
+                    bscYear: updateUserInfo.bscYear,
+                    hscGrade: updateUserInfo.hscGrade,
+                    hscRoll: updateUserInfo.hscRoll,
+                    hscYear: updateUserInfo.hscYear,
+                    jscGrade: updateUserInfo.jscGrade,
+                    jscRoll: updateUserInfo.jscRoll,
+                    jscYear: updateUserInfo.jscYear,
+                    pscGrade: updateUserInfo.pscGrade,
+                    pscRoll: updateUserInfo.pscRoll,
+                    pscYear: updateUserInfo.pscYear,
+                    sscGrade: updateUserInfo.sscGrade,
+                    sscRoll: updateUserInfo.sscRoll,
+                    sscYear: updateUserInfo.sscYear,
+
+                    nidUrl: updateUserInfo.nidUrl,
+                    passportUrl: updateUserInfo.passportUrl,
+                    certificatUrl: updateUserInfo.certificatUrl,
+                    ieltsUrl: updateUserInfo.ieltsUrl,
+
+                    userStatus: updateUserInfo.userStatus
+
+
+                }
+            }
+
+            const result = await usersCollection.updateOne(filter, user, options);
+            res.send(result);
+
+        })
+        // ---------------------------------------------------------------------------------------
 
 
 
