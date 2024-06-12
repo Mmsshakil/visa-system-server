@@ -82,7 +82,7 @@ async function run() {
         // })
 
 
-        
+
         // update user details after eca application-todo
 
         app.patch('/allEcaUsers/:id', async (req, res) => {
@@ -113,9 +113,52 @@ async function run() {
                     passportUrl: updateUserInfo.passportUrl,
                     certificatUrl: updateUserInfo.certificatUrl,
                     ieltsUrl: updateUserInfo.ieltsUrl,
+                    paymentMethod: updateUserInfo.paymentMethod,
+                    trxID: updateUserInfo.trxID,
 
                     userStatus: updateUserInfo.userStatus
 
+                }
+            }
+
+            const result = await usersCollection.updateOne(filter, user, options);
+            res.send(result);
+
+        })
+        // ---------------------------------------------------------------------------------------
+
+
+
+        // update user details after lmia application-todo
+
+        app.patch('/alllmiaUsers/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateUserInfo = req.body;
+            const user = {
+                $set: {
+
+                    birthDay: updateUserInfo.birthDay,
+                    bloodGroup: updateUserInfo.bloodGroup,
+                    companyName: updateUserInfo.companyName,
+                    jobExperience: updateUserInfo.jobExperience,
+                    jobTitle: updateUserInfo.jobTitle,
+                    lmiaPaymentMethod: updateUserInfo.lmiaPaymentMethod,
+                    lmiaTrxID: updateUserInfo.lmiaTrxID,
+                    maritalStatus: updateUserInfo.maritalStatus,
+                    motherName: updateUserInfo.motherName,
+                    parmanentAddre: updateUserInfo.parmanentAddre,
+                    parmanentCity: updateUserInfo.parmanentCity,
+                    permanentCountry: updateUserInfo.permanentCountry,
+                    presentAddre: updateUserInfo.presentAddre,
+                    presentCity: updateUserInfo.presentCity,
+                    presentCountry: updateUserInfo.presentCountry,
+        
+                    coverPhoto: updateUserInfo.coverPhoto,
+                    cvPhoto: updateUserInfo.cvPhoto,
+
+                    userStatus: updateUserInfo.userStatus
 
                 }
             }
@@ -130,7 +173,7 @@ async function run() {
 
 
 
-
+        // ----------------------------------------------------------------------------------------
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
