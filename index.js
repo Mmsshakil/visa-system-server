@@ -235,6 +235,28 @@ async function run() {
             res.send(result);
         })
 
+
+
+        // update user LMIA status and lmia photo by admin-
+
+        app.patch('/updateVisa/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateUserInfo = req.body;
+            const user = {
+                $set: {
+                    adminVisaPhoto: updateUserInfo.adminVisaPhoto,
+                    adminBiometricDate: updateUserInfo.adminBiometricDate,
+                    userStatus: 'visaComplete'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, user, options);
+            res.send(result);
+        })
+
+
+
         // ----------------------------------------------------------------------------------------
 
         // Send a ping to confirm a successful connection
