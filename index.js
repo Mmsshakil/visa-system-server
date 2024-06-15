@@ -72,14 +72,15 @@ async function run() {
             }
         });
 
-        // find a product---- this api problem
-        // app.get('/allusers/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: new ObjectId(id) }
-        //     // console.log(query);
-        //     const result = await usersCollection.findOne(query);
-        //     res.send(result);
-        // })
+        // find a user---- this api problem
+
+        app.get('/userDetails/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            // console.log(query);
+            const result = await usersCollection.findOne(query);
+            res.send(result);
+        })
 
 
 
@@ -154,7 +155,7 @@ async function run() {
                     presentAddre: updateUserInfo.presentAddre,
                     presentCity: updateUserInfo.presentCity,
                     presentCountry: updateUserInfo.presentCountry,
-        
+
                     coverPhoto: updateUserInfo.coverPhoto,
                     cvPhoto: updateUserInfo.cvPhoto,
 
@@ -169,9 +170,70 @@ async function run() {
         })
         // ---------------------------------------------------------------------------------------
 
+        // update user details after visa application-todo
+
+        app.patch('/allVisaUsers/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateUserInfo = req.body;
+            const user = {
+                $set: {
+
+                    visaPaymentMethod: updateUserInfo.visaPaymentMethod,
+                    visaTrxID: updateUserInfo.visaTrxID,
+                    visaFormEca: updateUserInfo.visaFormEca,
+                    visaFormLmia: updateUserInfo.visaFormLmia,
+
+                    userStatus: updateUserInfo.userStatus
+
+                }
+            }
+
+            const result = await usersCollection.updateOne(filter, user, options);
+            res.send(result);
+
+        })
+
+        // -------------------------------------------------------------------------------------
+        // -----------------------------------admin control start-------------------------------
+
+        // update user eca status and eca photo by admin-
+
+        app.patch('/updateEca/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateUserInfo = req.body;
+            const user = {
+                $set: {
+                    adminEcaPhoto: updateUserInfo.adminEcaPhoto,
+                    // userStatus: updateUserInfo.userStatus
+                    userStatus: 'ecaComplete'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, user, options);
+            res.send(result);
+        })
 
 
+        // update user LMIA status and lmia photo by admin-
 
+        app.patch('/updateLmia/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateUserInfo = req.body;
+            const user = {
+                $set: {
+                    adminEcaPhoto: updateUserInfo.adminEcaPhoto,
+                    // userStatus: updateUserInfo.userStatus
+                    userStatus: 'lmiaComplete'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, user, options);
+            res.send(result);
+        })
 
         // ----------------------------------------------------------------------------------------
 
