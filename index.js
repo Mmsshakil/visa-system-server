@@ -58,7 +58,7 @@ async function run() {
 
 
 
-        // get carts of specific user's email
+        // get users of specific user's email
 
         app.get('/allusers/:email', async (req, res) => {
             const email = req.params.email; // Access the email from route parameters
@@ -72,6 +72,24 @@ async function run() {
             }
         });
 
+
+        // get user by passport number
+        app.get('/searchPassport/:passport', async (req, res) => {
+            const passport = req.params.passport; // Access the passport from route parameters
+            const query = { passport: passport };
+            try {
+                const result = await usersCollection.find(query).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+
+
+
+
+
         // find a user---- this api problem
 
         app.get('/userDetails/:id', async (req, res) => {
@@ -81,6 +99,10 @@ async function run() {
             const result = await usersCollection.findOne(query);
             res.send(result);
         })
+
+
+
+
 
 
 
@@ -226,7 +248,7 @@ async function run() {
             const updateUserInfo = req.body;
             const user = {
                 $set: {
-                    adminEcaPhoto: updateUserInfo.adminEcaPhoto,
+                    adminLmiaPhoto: updateUserInfo.adminLmiaPhoto,
                     // userStatus: updateUserInfo.userStatus
                     userStatus: 'lmiaComplete'
                 }
@@ -247,7 +269,7 @@ async function run() {
             const user = {
                 $set: {
                     adminVisaPhoto: updateUserInfo.adminVisaPhoto,
-                    adminBiometricDate: updateUserInfo.adminBiometricDate,
+                    biometric: updateUserInfo.biometric,
                     userStatus: 'visaComplete'
                 }
             }
