@@ -32,6 +32,7 @@ async function run() {
         await client.connect();
 
         const usersCollection = client.db('visaDB').collection('users');
+        const jobsCollection = client.db('visaDB').collection('jobs');
 
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -277,6 +278,16 @@ async function run() {
             res.send(result);
         })
 
+
+        // get all jobs data
+        app.get('/jobs', async(req, res) =>{
+            const result = await jobsCollection.find().toArray();
+            res.send(result);
+        })
+
+        // ----------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------
 
 
         // ----------------------------------------------------------------------------------------
