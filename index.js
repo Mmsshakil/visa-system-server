@@ -33,6 +33,7 @@ async function run() {
 
         const usersCollection = client.db('visaDB').collection('users');
         const jobsCollection = client.db('visaDB').collection('jobs');
+        const countriesCollection = client.db('visaDB').collection('countries');
 
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -280,10 +281,19 @@ async function run() {
 
 
         // get all jobs data
-        app.get('/jobs', async(req, res) =>{
+        app.get('/jobs', async (req, res) => {
             const result = await jobsCollection.find().toArray();
             res.send(result);
         })
+
+
+        // get all countries date
+        app.get('/countries', async (req, res) => {
+            const result = await countriesCollection.find().toArray();
+            res.send(result);
+        })
+
+
 
         // ----------------------------------------------------------------------------
         // ----------------------------------------------------------------------------
