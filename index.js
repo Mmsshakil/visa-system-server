@@ -70,11 +70,16 @@ async function run() {
         const verifyAdmin = async (req, res, next) => {
             const email = req.decoded.email;
             const query = { email: email };
-            const user = await usersCollection.find().query();
-            const isAdmin = user?.role === 'admin';
-            if (!isAdmin) {
+            const user = await usersCollection.findOne(query);
+            // const isAdmin = user?.role === 'admin';
+            // if (!isAdmin) {
+            //     return res.send(403).send({ message: 'forbidden access' });
+            // }
+
+            if (!user || user.role !== 'admin') {
                 return res.send(403).send({ message: 'forbidden access' });
             }
+
             next();
         }
 
@@ -100,32 +105,56 @@ async function run() {
 
 
         // show all users data
-        app.get('/allusers', verifyToken, async (req, res) => {
-            // console.log(req.headers);
-            const cursor = usersCollection.find();
-            const result = await cursor.toArray();
-            res.send(result);
-        })
+        // app.get('/allusers', verifyToken, verifyAdmin, async (req, res) => {
+        //     // console.log(req.headers);
+        //     const cursor = usersCollection.find();
+        //     const result = await cursor.toArray();
+        //     res.send(result);
+        // })
+
+        app.get('/allusers', verifyToken, verifyAdmin, async (req, res) => {
+            try {
+                const result = await usersCollection.find().toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send('Internal Server Error');
+            }
+        });
 
         // admin check api
+        // app.get('/user/admin/:email', verifyToken, async (req, res) => {
+        //     const email = req.params.email;
+        //     if (email !== req.decoded.email) {
+        //         return res.send(403).send({ message: 'unauthorized access' })
+        //     }
+        //     const query = { email: email };
+        //     const user = await usersCollection.findOne(query);
+        //     let admin = false;
+        //     if (user) {
+        //         admin = user?.role === 'admin';
+        //     }
+        //     res.send({ admin });
+        // })
+
         app.get('/user/admin/:email', verifyToken, async (req, res) => {
-            const email = req.params.email;
-            if (email !== req.decoded.email) {
-                return res.send(403).send({ message: 'unauthorized access' })
+            try {
+                const email = req.params.email;
+                if (email !== req.decoded.email) {
+                    return res.status(403).send({ message: 'unauthorized access' });
+                }
+                const query = { email: email };
+                const user = await usersCollection.findOne(query);
+                const admin = user?.role === 'admin';
+                res.send({ admin });
+            } catch (error) {
+                res.status(500).send('Internal Server Error');
             }
-            const query = { email: email };
-            const user = await usersCollection.findOne(query);
-            let admin = false;
-            if (user) {
-                admin = user?.role === 'admin';
-            }
-            res.send({ admin });
-        })
+        });
 
 
         // get users of specific user's email
 
-        app.get('/allusers/:email', async (req, res) => {
+        app.get('/allusers/:email',  async (req, res) => {
             const email = req.params.email; // Access the email from route parameters
             const query = { email: email };
             try {
@@ -287,7 +316,7 @@ async function run() {
 
         // update user eca status and eca photo by admin-
 
-        app.patch('/updateEca/:id', async (req, res) => {
+        app.patch('/updateEca/:id',  async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
