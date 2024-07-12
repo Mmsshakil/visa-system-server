@@ -35,6 +35,7 @@ async function run() {
         const usersCollection = client.db('visaDB').collection('users');
         const jobsCollection = client.db('visaDB').collection('jobs');
         const countriesCollection = client.db('visaDB').collection('countries');
+        const paymentsCollection = client.db('visaDB').collection('payments');
 
         // jwt realted api
         app.post('/jwt', async (req, res) => {
@@ -154,7 +155,7 @@ async function run() {
 
         // get users of specific user's email
 
-        app.get('/allusers/:email',  async (req, res) => {
+        app.get('/allusers/:email', async (req, res) => {
             const email = req.params.email; // Access the email from route parameters
             const query = { email: email };
             try {
@@ -316,7 +317,7 @@ async function run() {
 
         // update user eca status and eca photo by admin-
 
-        app.patch('/updateEca/:id',  async (req, res) => {
+        app.patch('/updateEca/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
@@ -385,9 +386,58 @@ async function run() {
             res.send(result);
         })
 
+        // app.get('/countries', async (req, res) => {
+        //     try {
+        //         const result = await countriesCollection.find().sort({ name: 1 }).toArray();
+        //         res.send(result);
+        //     } catch (err) {
+        //         console.error("Error fetching data:", err);
+        //         res.status(500).send({ error: "Error fetching data" });
+        //     }
+        // });
 
 
         // ----------------------------------------------------------------------------
+        // payments apis
+
+
+        app.patch('/paymentUpdate', verifyToken, verifyAdmin, async (req, res) => {
+            try {
+                const filter = {}; // Empty filter to match all documents
+                const options = { upsert: true }; //
+                const updatePaymentInfo = req.body;
+                const user = {
+                    $set: {
+                        bkash: updatePaymentInfo.bkash,
+                        paypal: updatePaymentInfo.paypal,
+                        appleMail: updatePaymentInfo.appleMail,
+                        applyNumber: updatePaymentInfo.applyNumber
+                    }
+                };
+
+                const result = await paymentsCollection.updateMany(filter, user, options);
+
+                if (result.matchedCount === 0) {
+                    return res.status(404).send({ error: 'No matching document found' });
+                }
+
+                res.send(result);
+            } catch (error) {
+                console.error('Error updating payment information', error);
+                res.status(500).send({ error: 'An error occurred while updating payment information' });
+            }
+        });
+
+
+        app.get('/paymetMethods', async (req, res) => {
+            try {
+                const result = await paymentsCollection.find().toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send('Internal Server Error');
+            }
+        });
+
         // ----------------------------------------------------------------------------
         // ----------------------------------------------------------------------------
 
